@@ -1,0 +1,24 @@
+{
+    "name": "selmonal/sms",
+    "description": "",
+    "keywords": [],
+    "authors": [
+        {
+            "name": "selmonal",
+            "email": "selmonal@gmail.com"
+        }
+    ],
+    "require": {
+        "illuminate/support": "~5.0",
+        "guzzle/guzzle": "^3.9"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.5"
+    },
+    "autoload": {
+       "psr-4": {
+         "Selmonal\\SMS\\": "src/SMS"
+        }
+    },
+    "license": "MIT"
+}
