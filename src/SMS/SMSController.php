@@ -61,7 +61,11 @@ class SMSController extends Controller
             Input::get('type') : null;
 
         $messages = Message::orderBy('id', 'desc')
-            ->whereType($currentType)
+            ->where(function ($query) use ($currentType) {
+                if ($currentType) {
+                    $query->whereType($currentType);
+                }
+            })
             ->paginate();
 
         return view('sms::log', compact('messages', 'currentType'));
