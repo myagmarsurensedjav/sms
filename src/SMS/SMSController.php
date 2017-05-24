@@ -57,18 +57,37 @@ class SMSController extends Controller
      */
     public function log()
     {
-        $currentType = Input::has('type') ?
-            Input::get('type') : null;
-
+        $currentType = Input::has('type') ? Input::get('type') : null;
+        $currentModalType = Input::has('modaltype') ? Input::get('modaltype') : null;
+        $dates = Input::has('date') ? strtodates(Input::get('date')): null ;
+        $date = Input::get('date');
+        $text = Input::has('text') ? Input::get('text') : null;
+        $number = Input::has('number') ? Input::get('number') : null;
         $messages = Message::orderBy('id', 'desc')
-            ->where(function ($query) use ($currentType) {
-                if ($currentType) {
-                    $query->whereType($currentType);
+        ->where(function ($query) use ($currentType) {
+            if ($currentType) {
+                $query->whereType($currentType);
+            }
+        })
+        ->orWhere(
+            function ($query) use ($dates,$text,$number,$currentModalType) {
+                if ($currentModalType) {
+                $query->whereType($currentModalType);
+               }
+                if ($dates) {
+                    $query->where('sent_at', '>=', $dates[0]->format('Y-m-d').' 00:00:00')
+                    ->where('sent_at', '<=', $dates[1]->format('Y-m-d').' 23:59:59');
                 }
-            })
-            ->paginate();
-
-        return view('sms::log', compact('messages', 'currentType'));
+                if($text){
+                  $query->where('text', 'like','%'. $text . '%');
+              }
+              if($number){
+                  $query->where('phone_number', 'like', $number . '%');
+              }
+          })
+        ->paginate()
+        ->appends(Input::all());
+        return view('sms::log', compact('messages', 'currentType','currentModalType','date','text','number'));
     }
 
     /**
@@ -94,8 +113,8 @@ class SMSController extends Controller
 
 
             return Redirect::back()
-                ->withInput()
-                ->with('error_message', $exception->getMessage());
+            ->withInput()
+            ->with('error_message', $exception->getMessage());
 
         }
     }
